@@ -1,0 +1,13 @@
+node_modules/
+dist/
+target/
+backend/data/
+*.log
+*.pid
+*.h2.db
+*.mv.db
+*.trace.db
+.idea/
+.vscode/
+.DS_Store
+lead-mql-sql-mvp.zip
