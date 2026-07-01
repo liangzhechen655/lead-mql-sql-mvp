@@ -98,7 +98,7 @@
             </el-table-column>
             <el-table-column label="操作" width="228">
               <template #default="{ row }">
-                <el-button size="small" :icon="User" @click.stop="quickAssign(row)">分配</el-button>
+                <el-button size="small" :icon="User" :disabled="roleMode !== 'MANAGER'" @click.stop="openAssignDialog(row)">分配</el-button>
                 <el-button size="small" :icon="EditPen" @click.stop="openStatusDialog(row)">状态</el-button>
                 <el-button size="small" type="primary" :icon="ChatLineSquare" @click.stop="openFollowDialog(row)">跟进</el-button>
               </template>
@@ -238,6 +238,28 @@
       </template>
     </el-dialog>
 
+    <el-dialog v-model="assignDialogVisible" title="分配负责人" width="520px">
+      <el-form label-width="90px">
+        <el-form-item label="线索">
+          <el-input :model-value="selectedLead ? `${selectedLead.customerName} / ${selectedLead.phone}` : ''" disabled />
+        </el-form-item>
+        <el-form-item label="负责人">
+          <el-select v-model="assignForm.ownerId" placeholder="请选择销售负责人">
+            <el-option
+              v-for="user in salesUsers.filter((item) => item.role === 'SALES')"
+              :key="user.id"
+              :label="`${user.name}（${user.team || '销售组'}）`"
+              :value="user.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="assignDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="assignLead">保存分配</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="followDialogVisible" title="新增跟进记录" width="560px">
       <el-form label-width="90px">
         <el-form-item label="方式">
@@ -289,6 +311,7 @@ const detailVisible = ref(false)
 const leadDialogVisible = ref(false)
 const statusDialogVisible = ref(false)
 const followDialogVisible = ref(false)
+const assignDialogVisible = ref(false)
 const selectedLead = ref(null)
 
 const loading = reactive({ leads: false, dashboard: false, anomalies: false })
@@ -297,6 +320,7 @@ const filters = reactive({ keyword: '', status: '', source: '' })
 const leadForm = reactive({ customerName: '', phone: '', source: '', channel: '', grade: 'UNKNOWN', remark: '' })
 const statusForm = reactive({ status: 'PENDING_CALL', reason: '', invalidReason: '' })
 const followForm = reactive({ method: '电话', content: '' })
+const assignForm = reactive({ ownerId: null })
 const callForm = reactive({ leadId: null, connected: true, valid: true, rawResult: '客户接通且表达兴趣' })
 const wechatForm = reactive({ leadId: null, added: true, externalUserId: 'wm_demo_001', failedReason: '' })
 
@@ -454,12 +478,19 @@ async function updateStatus() {
   }
 }
 
-async function quickAssign(row) {
-  const target = salesUsers.value.find((u) => u.role === 'SALES' && u.name !== row.ownerName) || salesUsers.value.find((u) => u.role === 'SALES')
+function openAssignDialog(row) {
+  selectedLead.value = row
+  assignForm.ownerId = row.ownerId || null
+  assignDialogVisible.value = true
+}
+
+async function assignLead() {
+  const target = salesUsers.value.find((u) => u.id === assignForm.ownerId)
   if (!target) return
   try {
-    await api.assign(row.id, { ownerId: target.id, operatorName: '王主管' })
+    await api.assign(selectedLead.value.id, { ownerId: target.id, operatorName: '王主管' })
     ElMessage.success(`已分配给 ${target.name}`)
+    assignDialogVisible.value = false
     refreshAll()
   } catch (error) {
     ElMessage.error(errorMessage(error))
