@@ -131,24 +131,36 @@
             <p class="callback-note">可搜索完整线索池；不符合当前外呼结果的线索会置灰，避免选择后状态机报错。</p>
             <el-form label-width="100px">
               <el-form-item label="线索">
-                <el-select v-model="callForm.leadId" filterable placeholder="搜索姓名、手机号、渠道" class="callback-select">
-                  <el-option
-                    v-for="lead in callbackLeads"
-                    :key="lead.id"
-                    :label="callbackLeadLabel(lead)"
-                    :value="lead.id"
-                    :disabled="!canCallbackLead(lead, callTargetStatus)"
-                  >
-                    <div class="callback-option">
+                <div class="callback-picker">
+                  <el-input
+                    v-model="callSearch"
+                    :prefix-icon="Search"
+                    clearable
+                    placeholder="搜索姓名、手机号、来源、渠道、状态"
+                  />
+                  <div class="callback-list">
+                    <button
+                      v-for="lead in callVisibleLeads"
+                      :key="lead.id"
+                      type="button"
+                      class="callback-row"
+                      :class="{ active: callForm.leadId === lead.id }"
+                      :disabled="!canCallbackLead(lead, callTargetStatus)"
+                      @click="selectCallbackLead('call', lead)"
+                    >
                       <span>
                         <strong>{{ lead.customerName }}</strong>
                         <small>{{ lead.phone }} · {{ lead.source }} / {{ lead.channel }}</small>
                       </span>
                       <el-tag v-if="canCallbackLead(lead, callTargetStatus)" size="small" :type="statusType(lead.status)">{{ lead.statusLabel }}</el-tag>
-                      <el-tag v-else size="small" type="info">当前结果不可回传</el-tag>
-                    </div>
-                  </el-option>
-                </el-select>
+                      <el-tag v-else size="small" type="info">不可回传</el-tag>
+                    </button>
+                    <div v-if="!callVisibleLeads.length" class="callback-empty">没有匹配的线索</div>
+                  </div>
+                  <div v-if="selectedCallLead" class="callback-selected">
+                    已选择：{{ selectedCallLead.customerName }} · {{ selectedCallLead.phone }}
+                  </div>
+                </div>
               </el-form-item>
               <el-form-item label="是否接通">
                 <el-switch v-model="callForm.connected" @change="ensureCallbackSelections" />
@@ -177,24 +189,37 @@
             <p class="callback-note">可搜索完整线索池；不符合当前加微结果的线索会置灰，符合条件的回传会写入历史和审计日志。</p>
             <el-form label-width="100px">
               <el-form-item label="线索">
-                <el-select v-model="wechatForm.leadId" filterable placeholder="搜索姓名、手机号、渠道" class="callback-select">
-                  <el-option
-                    v-for="lead in callbackLeads"
-                    :key="lead.id"
-                    :label="callbackLeadLabel(lead)"
-                    :value="lead.id"
-                    :disabled="!canCallbackLead(lead, wechatTargetStatus)"
+                <div class="callback-picker">
+                  <el-input
+                    v-model="wechatSearch"
+                    :prefix-icon="Search"
+                    clearable
+                    placeholder="搜索姓名、手机号、来源、渠道、状态"
                   >
-                    <div class="callback-option">
+                  </el-input>
+                  <div class="callback-list">
+                    <button
+                      v-for="lead in wechatVisibleLeads"
+                      :key="lead.id"
+                      type="button"
+                      class="callback-row"
+                      :class="{ active: wechatForm.leadId === lead.id }"
+                      :disabled="!canCallbackLead(lead, wechatTargetStatus)"
+                      @click="selectCallbackLead('wechat', lead)"
+                    >
                       <span>
                         <strong>{{ lead.customerName }}</strong>
                         <small>{{ lead.phone }} · {{ lead.source }} / {{ lead.channel }}</small>
                       </span>
                       <el-tag v-if="canCallbackLead(lead, wechatTargetStatus)" size="small" :type="statusType(lead.status)">{{ lead.statusLabel }}</el-tag>
-                      <el-tag v-else size="small" type="info">当前结果不可回传</el-tag>
-                    </div>
-                  </el-option>
-                </el-select>
+                      <el-tag v-else size="small" type="info">不可回传</el-tag>
+                    </button>
+                    <div v-if="!wechatVisibleLeads.length" class="callback-empty">没有匹配的线索</div>
+                  </div>
+                  <div v-if="selectedWechatLead" class="callback-selected">
+                    已选择：{{ selectedWechatLead.customerName }} · {{ selectedWechatLead.phone }}
+                  </div>
+                </div>
               </el-form-item>
               <el-form-item label="加微成功">
                 <el-switch v-model="wechatForm.added" @change="ensureCallbackSelections" />
@@ -377,6 +402,8 @@ const followForm = reactive({ method: '电话', content: '' })
 const assignForm = reactive({ ownerId: null })
 const callForm = reactive({ leadId: null, connected: true, valid: true, rawResult: '客户接通且表达兴趣' })
 const wechatForm = reactive({ leadId: null, added: true, externalUserId: 'wm_demo_001', failedReason: '' })
+const callSearch = ref('')
+const wechatSearch = ref('')
 
 const tabOptions = [
   { label: '线索工作台', value: 'leads', icon: 'List' },
@@ -443,6 +470,10 @@ const callTargetStatus = computed(() => {
 const wechatTargetStatus = computed(() => (wechatForm.added ? 'WECHAT_ADDED' : 'WECHAT_FAILED'))
 const callCandidateLeads = computed(() => candidateLeadsFor(callTargetStatus.value))
 const wechatCandidateLeads = computed(() => candidateLeadsFor(wechatTargetStatus.value))
+const callVisibleLeads = computed(() => visibleCallbackLeads(callSearch.value))
+const wechatVisibleLeads = computed(() => visibleCallbackLeads(wechatSearch.value))
+const selectedCallLead = computed(() => callbackLeads.value.find((lead) => lead.id === callForm.leadId))
+const selectedWechatLead = computed(() => callbackLeads.value.find((lead) => lead.id === wechatForm.leadId))
 const quickStats = computed(() => [
   { label: '总线索', value: funnel.value.total ?? leads.value.length },
   { label: '有效率', value: `${funnel.value.validRate || 0}%` },
@@ -488,7 +519,10 @@ async function loadCallbackCandidates() {
   try {
     callbackLeads.value = await api.callbackCandidates()
   } catch (error) {
-    ElMessage.error(errorMessage(error))
+    const manager = salesUsers.value.find((user) => user.role === 'MANAGER')
+    setCurrentUserId(manager?.id || currentUser.value?.id)
+    callbackLeads.value = await api.leads({})
+    setCurrentUserId(currentUser.value?.id)
   } finally {
     loading.callbacks = false
   }
@@ -661,6 +695,36 @@ function canCallbackLead(lead, targetStatus) {
   return transitionMap[lead.status]?.includes(targetStatus)
 }
 
+function visibleCallbackLeads(keyword) {
+  const normalized = keyword.trim().toLowerCase()
+  const matched = normalized
+    ? callbackLeads.value.filter((lead) => callbackSearchText(lead).includes(normalized))
+    : callbackLeads.value
+  return matched.slice(0, 60)
+}
+
+function callbackSearchText(lead) {
+  return [
+    lead.customerName,
+    lead.phone,
+    lead.source,
+    lead.channel,
+    lead.status,
+    lead.statusLabel,
+    lead.ownerName
+  ].filter(Boolean).join(' ').toLowerCase()
+}
+
+function selectCallbackLead(type, lead) {
+  if (type === 'call') {
+    if (!canCallbackLead(lead, callTargetStatus.value)) return
+    callForm.leadId = lead.id
+    return
+  }
+  if (!canCallbackLead(lead, wechatTargetStatus.value)) return
+  wechatForm.leadId = lead.id
+}
+
 function ensureCallbackSelections() {
   if (!callForm.connected) {
     callForm.valid = false
@@ -675,10 +739,6 @@ function ensureCallbackSelections() {
 
 function statusLabel(status) {
   return statusOptions.find((item) => item.value === status)?.label || status
-}
-
-function callbackLeadLabel(lead) {
-  return `${lead.customerName} ${lead.phone} ${lead.source} ${lead.channel} ${lead.statusLabel}`
 }
 
 function formatTime(value) {

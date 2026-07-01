@@ -598,26 +598,69 @@ textarea {
   width: 100%;
 }
 
-.callback-option {
+.callback-picker {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.callback-list {
+  display: grid;
+  gap: 8px;
+  max-height: 228px;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.callback-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
   width: 100%;
+  min-height: 54px;
+  padding: 9px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #172033;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 }
 
-.callback-option span {
+.callback-row:hover:not(:disabled),
+.callback-row.active {
+  border-color: var(--cyan);
+  background: #eff9fc;
+  box-shadow: 0 6px 16px rgba(39, 168, 216, 0.12);
+}
+
+.callback-row:disabled {
+  color: #94a3b8;
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+
+.callback-row span {
   display: grid;
   min-width: 0;
   line-height: 1.25;
 }
 
-.callback-option strong {
+.callback-row strong {
   color: #172033;
   font-size: 13px;
 }
 
-.callback-option small {
+.callback-row:disabled strong {
+  color: #94a3b8;
+}
+
+.callback-row small {
   overflow: hidden;
   color: #64748b;
   font-size: 12px;
@@ -625,8 +668,22 @@ textarea {
   white-space: nowrap;
 }
 
-.callback-option .el-tag {
+.callback-row .el-tag {
   flex: 0 0 auto;
+}
+
+.callback-empty,
+.callback-selected {
+  padding: 8px 10px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.callback-selected {
+  border: 1px dashed #b8ddea;
+  border-radius: 8px;
+  color: #166989;
+  background: #f0fbff;
 }
 
 .detail-summary {
