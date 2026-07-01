@@ -31,6 +31,7 @@ export const api = {
   salesUsers: () => http.get('/sales-users').then((r) => r.data),
   funnel: () => http.get('/dashboard/funnel').then((r) => r.data),
   anomalies: () => http.get('/dashboard/anomalies').then((r) => r.data),
+  callbackCandidates: () => http.get('/callbacks/candidates').then((r) => r.data),
   callCallback: (payload) => http.post('/callbacks/call-result', payload).then((r) => r.data),
   wechatCallback: (payload) => http.post('/callbacks/wechat-result', payload).then((r) => r.data),
   ask: (question) => http.post('/query/natural-language', { question }).then((r) => r.data)

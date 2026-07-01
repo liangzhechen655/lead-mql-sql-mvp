@@ -308,6 +308,19 @@ public class LeadService {
     }
 
     @Transactional(readOnly = true)
+    public List<LeadResponse> listCallbackCandidates() {
+        Specification<SalesLead> spec = (root, query, cb) -> {
+            root.fetch("owner", JoinType.LEFT);
+            query.distinct(true);
+            return cb.conjunction();
+        };
+        return leadRepository.findAll(spec).stream()
+                .sorted(Comparator.comparing(SalesLead::getUpdatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .map(this::toLeadResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<SalesUserResponse> listSalesUsers() {
         return userRepository.findAll().stream()
                 .map(u -> new SalesUserResponse(u.getId(), u.getName(), u.getRole(), u.getTeam()))

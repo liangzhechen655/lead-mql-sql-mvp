@@ -119,38 +119,84 @@
 
         <QueryPanel v-if="activeTab === 'query'" :funnel="funnel" :anomalies="anomalies" />
 
-        <section v-if="activeTab === 'callbacks'" class="panel callback-grid">
-          <div>
-            <h3>模拟外呼系统回调</h3>
+        <section v-if="activeTab === 'callbacks'" class="panel callback-grid" v-loading="loading.callbacks">
+          <div class="callback-card">
+            <div class="callback-head">
+              <div>
+                <span>Call Center</span>
+                <h3>模拟外呼系统回调</h3>
+              </div>
+              <el-tag type="info">{{ callCandidateLeads.length }} 条可回传</el-tag>
+            </div>
+            <p class="callback-note">候选线索来自完整线索池，并按当前回传结果自动过滤，避免选择后状态机报错。</p>
             <el-form label-width="100px">
               <el-form-item label="线索">
-                <el-select v-model="callForm.leadId" filterable placeholder="选择线索">
-                  <el-option v-for="lead in leads" :key="lead.id" :label="`${lead.customerName} ${lead.phone}`" :value="lead.id" />
+                <el-select v-model="callForm.leadId" filterable placeholder="搜索姓名、手机号、渠道" class="callback-select">
+                  <el-option
+                    v-for="lead in callCandidateLeads"
+                    :key="lead.id"
+                    :label="callbackLeadLabel(lead)"
+                    :value="lead.id"
+                  >
+                    <div class="callback-option">
+                      <span>
+                        <strong>{{ lead.customerName }}</strong>
+                        <small>{{ lead.phone }} · {{ lead.source }} / {{ lead.channel }}</small>
+                      </span>
+                      <el-tag size="small" :type="statusType(lead.status)">{{ lead.statusLabel }}</el-tag>
+                    </div>
+                  </el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="是否接通">
-                <el-switch v-model="callForm.connected" />
+                <el-switch v-model="callForm.connected" @change="ensureCallbackSelections" />
               </el-form-item>
               <el-form-item label="是否有效">
-                <el-switch v-model="callForm.valid" />
+                <el-switch v-model="callForm.valid" :disabled="!callForm.connected" @change="ensureCallbackSelections" />
+              </el-form-item>
+              <el-form-item label="目标状态">
+                <el-tag :type="statusType(callTargetStatus)">{{ statusLabel(callTargetStatus) }}</el-tag>
               </el-form-item>
               <el-form-item label="备注">
                 <el-input v-model="callForm.rawResult" />
               </el-form-item>
-              <el-button type="primary" :icon="Phone" @click="sendCallCallback">发送外呼回调</el-button>
+              <el-button type="primary" :icon="Phone" :disabled="!callForm.leadId" @click="sendCallCallback">发送外呼回调</el-button>
             </el-form>
           </div>
 
-          <div>
-            <h3>模拟企微/SCRM 回调</h3>
+          <div class="callback-card">
+            <div class="callback-head">
+              <div>
+                <span>WeCom / SCRM</span>
+                <h3>模拟企微/SCRM 回调</h3>
+              </div>
+              <el-tag type="info">{{ wechatCandidateLeads.length }} 条可回传</el-tag>
+            </div>
+            <p class="callback-note">用于演示企微或 SCRM 把加微结果回写到线索系统，同时记录状态历史和审计日志。</p>
             <el-form label-width="100px">
               <el-form-item label="线索">
-                <el-select v-model="wechatForm.leadId" filterable placeholder="选择线索">
-                  <el-option v-for="lead in leads" :key="lead.id" :label="`${lead.customerName} ${lead.phone}`" :value="lead.id" />
+                <el-select v-model="wechatForm.leadId" filterable placeholder="搜索姓名、手机号、渠道" class="callback-select">
+                  <el-option
+                    v-for="lead in wechatCandidateLeads"
+                    :key="lead.id"
+                    :label="callbackLeadLabel(lead)"
+                    :value="lead.id"
+                  >
+                    <div class="callback-option">
+                      <span>
+                        <strong>{{ lead.customerName }}</strong>
+                        <small>{{ lead.phone }} · {{ lead.source }} / {{ lead.channel }}</small>
+                      </span>
+                      <el-tag size="small" :type="statusType(lead.status)">{{ lead.statusLabel }}</el-tag>
+                    </div>
+                  </el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="加微成功">
-                <el-switch v-model="wechatForm.added" />
+                <el-switch v-model="wechatForm.added" @change="ensureCallbackSelections" />
+              </el-form-item>
+              <el-form-item label="目标状态">
+                <el-tag :type="statusType(wechatTargetStatus)">{{ statusLabel(wechatTargetStatus) }}</el-tag>
               </el-form-item>
               <el-form-item label="企微ID">
                 <el-input v-model="wechatForm.externalUserId" />
@@ -158,7 +204,7 @@
               <el-form-item label="失败原因">
                 <el-input v-model="wechatForm.failedReason" />
               </el-form-item>
-              <el-button type="primary" :icon="Connection" @click="sendWechatCallback">发送加微回调</el-button>
+              <el-button type="primary" :icon="Connection" :disabled="!wechatForm.leadId" @click="sendWechatCallback">发送加微回调</el-button>
             </el-form>
           </div>
         </section>
@@ -306,6 +352,7 @@ import QueryPanel from './components/QueryPanel.vue'
 const activeTab = ref('leads')
 const roleMode = ref('MANAGER')
 const leads = ref([])
+const callbackLeads = ref([])
 const salesUsers = ref([])
 const funnel = ref({})
 const anomalies = ref([])
@@ -317,7 +364,7 @@ const followDialogVisible = ref(false)
 const assignDialogVisible = ref(false)
 const selectedLead = ref(null)
 
-const loading = reactive({ leads: false, dashboard: false, anomalies: false })
+const loading = reactive({ leads: false, dashboard: false, anomalies: false, callbacks: false })
 const filters = reactive({ keyword: '', status: '', source: '' })
 
 const leadForm = reactive({ customerName: '', phone: '', source: '', channel: '', grade: 'UNKNOWN', remark: '' })
@@ -385,6 +432,13 @@ const availableStatusOptions = computed(() => {
   const options = statusOptions.filter((item) => allowed.includes(item.value))
   return options.length ? options : statusOptions.filter((item) => item.value === selectedLead.value.status)
 })
+const callTargetStatus = computed(() => {
+  if (!callForm.connected) return 'CALLED_NOT_CONNECTED'
+  return callForm.valid ? 'VALID' : 'INVALID'
+})
+const wechatTargetStatus = computed(() => (wechatForm.added ? 'WECHAT_ADDED' : 'WECHAT_FAILED'))
+const callCandidateLeads = computed(() => candidateLeadsFor(callTargetStatus.value))
+const wechatCandidateLeads = computed(() => candidateLeadsFor(wechatTargetStatus.value))
 const quickStats = computed(() => [
   { label: '总线索', value: funnel.value.total ?? leads.value.length },
   { label: '有效率', value: `${funnel.value.validRate || 0}%` },
@@ -404,7 +458,8 @@ const currentUser = computed(() => {
 async function refreshAll() {
   await loadUsers()
   setCurrentUserId(currentUser.value?.id)
-  await Promise.all([loadLeads(), loadDashboard(), loadAnomalies()])
+  await Promise.all([loadLeads(), loadCallbackCandidates(), loadDashboard(), loadAnomalies()])
+  ensureCallbackSelections()
 }
 
 async function loadUsers() {
@@ -417,14 +472,21 @@ async function loadLeads() {
     setCurrentUserId(currentUser.value?.id)
     const params = { ...filters }
     leads.value = await api.leads(params)
-    const callableLead = leads.value.find((lead) => ['NEW', 'PENDING_CALL'].includes(lead.status))
-    const wechatReadyLead = leads.value.find((lead) => ['VALID', 'PENDING_WECHAT'].includes(lead.status))
-    if (!callForm.leadId && (callableLead || leads.value[0])) callForm.leadId = (callableLead || leads.value[0]).id
-    if (!wechatForm.leadId && (wechatReadyLead || leads.value[0])) wechatForm.leadId = (wechatReadyLead || leads.value[0]).id
   } catch (error) {
     ElMessage.error(errorMessage(error))
   } finally {
     loading.leads = false
+  }
+}
+
+async function loadCallbackCandidates() {
+  loading.callbacks = true
+  try {
+    callbackLeads.value = await api.callbackCandidates()
+  } catch (error) {
+    ElMessage.error(errorMessage(error))
+  } finally {
+    loading.callbacks = false
   }
 }
 
@@ -546,6 +608,10 @@ async function addFollowUp() {
 }
 
 async function sendCallCallback() {
+  if (!callForm.leadId) {
+    ElMessage.warning('请选择可回传的外呼线索')
+    return
+  }
   try {
     await api.callCallback({
       leadId: callForm.leadId,
@@ -562,6 +628,10 @@ async function sendCallCallback() {
 }
 
 async function sendWechatCallback() {
+  if (!wechatForm.leadId) {
+    ElMessage.warning('请选择可回传的加微线索')
+    return
+  }
   try {
     await api.wechatCallback({ ...wechatForm })
     ElMessage.success('加微回调已写入')
@@ -577,6 +647,30 @@ function statusType(status) {
   if (status === 'INVALID' || status === 'WECHAT_FAILED') return 'danger'
   if (status === 'VALID' || status === 'WECHAT_ADDED') return 'warning'
   return 'info'
+}
+
+function candidateLeadsFor(targetStatus) {
+  return callbackLeads.value.filter((lead) => transitionMap[lead.status]?.includes(targetStatus))
+}
+
+function ensureCallbackSelections() {
+  if (!callForm.connected) {
+    callForm.valid = false
+  }
+  if (!callCandidateLeads.value.some((lead) => lead.id === callForm.leadId)) {
+    callForm.leadId = callCandidateLeads.value[0]?.id || null
+  }
+  if (!wechatCandidateLeads.value.some((lead) => lead.id === wechatForm.leadId)) {
+    wechatForm.leadId = wechatCandidateLeads.value[0]?.id || null
+  }
+}
+
+function statusLabel(status) {
+  return statusOptions.find((item) => item.value === status)?.label || status
+}
+
+function callbackLeadLabel(lead) {
+  return `${lead.customerName} ${lead.phone} ${lead.source} ${lead.channel} ${lead.statusLabel}`
 }
 
 function formatTime(value) {

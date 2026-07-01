@@ -552,11 +552,77 @@ textarea {
 .callback-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px;
+  gap: 18px;
+  align-items: start;
 }
 
 .callback-grid h3 {
-  margin-bottom: 14px;
+  margin: 2px 0 0;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.callback-card {
+  min-height: 420px;
+  padding: 18px;
+  border: 1px solid #e1e8f0;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%);
+}
+
+.callback-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.callback-head span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.callback-note {
+  min-height: 42px;
+  margin: 0 0 18px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.callback-select {
+  width: 100%;
+}
+
+.callback-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+}
+
+.callback-option span {
+  display: grid;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.callback-option strong {
+  color: #172033;
+  font-size: 13px;
+}
+
+.callback-option small {
+  overflow: hidden;
+  color: #64748b;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .detail-summary {

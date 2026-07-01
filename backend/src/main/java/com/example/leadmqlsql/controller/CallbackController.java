@@ -5,6 +5,8 @@ import com.example.leadmqlsql.dto.CallbackDtos.WechatResultRequest;
 import com.example.leadmqlsql.dto.LeadDtos.LeadResponse;
 import com.example.leadmqlsql.service.LeadService;
 import jakarta.validation.Valid;
+import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,11 @@ public class CallbackController {
 
     public CallbackController(LeadService leadService) {
         this.leadService = leadService;
+    }
+
+    @GetMapping("/candidates")
+    public List<LeadResponse> candidates() {
+        return leadService.listCallbackCandidates();
     }
 
     @PostMapping("/call-result")

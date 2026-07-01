@@ -98,6 +98,10 @@ customerName,phone,source,channel
 
 ## 三方回调
 
+### GET /callbacks/candidates
+
+返回三方回调页面可选择的完整线索候选池。前端会根据外呼/企微当前回传结果，再按状态机规则过滤可操作线索。
+
 ### POST /callbacks/call-result
 
 模拟外呼系统回调。
