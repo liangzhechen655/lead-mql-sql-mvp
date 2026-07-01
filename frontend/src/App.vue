@@ -224,6 +224,9 @@
 
     <el-dialog v-model="statusDialogVisible" title="修改线索状态" width="520px">
       <el-form label-width="90px">
+        <el-form-item label="当前状态">
+          <el-tag :type="statusType(selectedLead?.status)">{{ selectedLead?.statusLabel || '-' }}</el-tag>
+        </el-form-item>
         <el-form-item label="目标状态">
           <el-select v-model="statusForm.status" placeholder="请选择可流转状态">
             <el-option v-for="item in availableStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -318,7 +321,7 @@ const loading = reactive({ leads: false, dashboard: false, anomalies: false })
 const filters = reactive({ keyword: '', status: '', source: '' })
 
 const leadForm = reactive({ customerName: '', phone: '', source: '', channel: '', grade: 'UNKNOWN', remark: '' })
-const statusForm = reactive({ status: 'PENDING_CALL', reason: '', invalidReason: '' })
+const statusForm = reactive({ status: '', reason: '', invalidReason: '' })
 const followForm = reactive({ method: '电话', content: '' })
 const assignForm = reactive({ ownerId: null })
 const callForm = reactive({ leadId: null, connected: true, valid: true, rawResult: '客户接通且表达兴趣' })
@@ -481,12 +484,15 @@ async function openDetail(row) {
 
 function openStatusDialog(row) {
   selectedLead.value = row
-  const allowed = transitionMap[row.status] || []
-  Object.assign(statusForm, { status: allowed[0] || row.status, reason: '', invalidReason: '' })
+  Object.assign(statusForm, { status: '', reason: '', invalidReason: '' })
   statusDialogVisible.value = true
 }
 
 async function updateStatus() {
+  if (!statusForm.status) {
+    ElMessage.warning('请选择目标状态')
+    return
+  }
   try {
     await api.updateStatus(selectedLead.value.id, {
       ...statusForm,
