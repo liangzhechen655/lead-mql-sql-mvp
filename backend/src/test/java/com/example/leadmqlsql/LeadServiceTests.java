@@ -76,6 +76,18 @@ class LeadServiceTests {
         assertThat(dashboardService.funnel().total()).isGreaterThanOrEqualTo(1);
     }
 
+    @Test
+    void validLeadCanMoveToWechatStages() {
+        LeadResponse lead = leadService.create(new LeadCreateRequest("Wechat Lead", "13900000005", "Website", "Website", LeadGrade.A, ""));
+        LeadResponse valid = leadService.updateStatus(lead.id(), new StatusUpdateRequest(LeadStatus.VALID, "call valid", "call-center", null));
+        LeadResponse pendingWechat = leadService.updateStatus(valid.id(), new StatusUpdateRequest(LeadStatus.PENDING_WECHAT, "prepare add wechat", "operator", null));
+        LeadResponse wechatAdded = leadService.updateStatus(pendingWechat.id(), new StatusUpdateRequest(LeadStatus.WECHAT_ADDED, "wechat added", "operator", null));
+
+        assertThat(valid.status()).isEqualTo(LeadStatus.VALID);
+        assertThat(pendingWechat.status()).isEqualTo(LeadStatus.PENDING_WECHAT);
+        assertThat(wechatAdded.status()).isEqualTo(LeadStatus.WECHAT_ADDED);
+    }
+
     private SalesUser findUserByRole(String role) {
         return userRepository.findAll().stream()
                 .filter(user -> role.equals(user.getRole()))

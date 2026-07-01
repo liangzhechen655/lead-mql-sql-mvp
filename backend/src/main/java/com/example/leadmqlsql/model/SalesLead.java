@@ -62,7 +62,8 @@ public class SalesLead {
     private String remark;
 
     @Version
-    private Long version;
+    @Column(nullable = false)
+    private Long version = 0L;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

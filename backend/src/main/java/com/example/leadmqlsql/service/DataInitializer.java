@@ -15,6 +15,7 @@ import com.example.leadmqlsql.repository.StatusHistoryRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,22 +25,27 @@ public class DataInitializer implements CommandLineRunner {
     private final SalesLeadRepository leadRepository;
     private final FollowUpRecordRepository followUpRepository;
     private final StatusHistoryRepository statusHistoryRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     public DataInitializer(
             SalesUserRepository userRepository,
             SalesLeadRepository leadRepository,
             FollowUpRecordRepository followUpRepository,
-            StatusHistoryRepository statusHistoryRepository
+            StatusHistoryRepository statusHistoryRepository,
+            JdbcTemplate jdbcTemplate
     ) {
         this.userRepository = userRepository;
         this.leadRepository = leadRepository;
         this.followUpRepository = followUpRepository;
         this.statusHistoryRepository = statusHistoryRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     @Transactional
     public void run(String... args) {
+        backfillVersionForExistingLeads();
+
         SalesUser zhang = ensureUser("张三", "SALES", "华东销售组");
         SalesUser li = ensureUser("李四", "SALES", "华南销售组");
         ensureUser("王主管", "MANAGER", "增长运营部");
@@ -72,6 +78,10 @@ public class DataInitializer implements CommandLineRunner {
         );
 
         seeds.forEach(this::createLeadIfMissing);
+    }
+
+    private void backfillVersionForExistingLeads() {
+        jdbcTemplate.update("update lead_record set version = 0 where version is null");
     }
 
     private SalesUser ensureUser(String name, String role, String team) {

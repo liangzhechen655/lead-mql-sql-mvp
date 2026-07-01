@@ -225,8 +225,8 @@
     <el-dialog v-model="statusDialogVisible" title="修改线索状态" width="520px">
       <el-form label-width="90px">
         <el-form-item label="目标状态">
-          <el-select v-model="statusForm.status">
-            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+          <el-select v-model="statusForm.status" placeholder="请选择可流转状态">
+            <el-option v-for="item in availableStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="原因"><el-input v-model="statusForm.reason" /></el-form-item>
@@ -347,6 +347,21 @@ const statusOptions = [
   { label: 'SQL', value: 'SQL' }
 ]
 
+const transitionMap = {
+  NEW: ['PENDING_CALL', 'VALID', 'CALLED_NOT_CONNECTED', 'INVALID'],
+  PENDING_CALL: ['CALLED_CONNECTED', 'CALLED_NOT_CONNECTED', 'VALID', 'INVALID'],
+  CALLED_CONNECTED: ['VALID', 'INVALID'],
+  CALLED_NOT_CONNECTED: ['PENDING_CALL', 'INVALID'],
+  VALID: ['PENDING_WECHAT', 'WECHAT_ADDED', 'WECHAT_FAILED', 'FOLLOWING', 'INVALID'],
+  INVALID: [],
+  PENDING_WECHAT: ['WECHAT_ADDED', 'WECHAT_FAILED'],
+  WECHAT_ADDED: ['FOLLOWING'],
+  WECHAT_FAILED: ['PENDING_WECHAT', 'INVALID'],
+  FOLLOWING: ['MQL', 'INVALID'],
+  MQL: ['SQL', 'FOLLOWING'],
+  SQL: []
+}
+
 
 const currentTitle = computed(() => tabOptions.find((t) => t.value === activeTab.value)?.label || '')
 const currentSubtitle = computed(() => {
@@ -361,6 +376,12 @@ const currentSubtitle = computed(() => {
 })
 
 const sourceOptions = computed(() => [...new Set(leads.value.map((item) => item.source).filter(Boolean))])
+const availableStatusOptions = computed(() => {
+  if (!selectedLead.value) return statusOptions
+  const allowed = transitionMap[selectedLead.value.status] || []
+  const options = statusOptions.filter((item) => allowed.includes(item.value))
+  return options.length ? options : statusOptions.filter((item) => item.value === selectedLead.value.status)
+})
 const quickStats = computed(() => [
   { label: '总线索', value: funnel.value.total ?? leads.value.length },
   { label: '有效率', value: `${funnel.value.validRate || 0}%` },
@@ -460,7 +481,8 @@ async function openDetail(row) {
 
 function openStatusDialog(row) {
   selectedLead.value = row
-  Object.assign(statusForm, { status: row.status, reason: '', invalidReason: '' })
+  const allowed = transitionMap[row.status] || []
+  Object.assign(statusForm, { status: allowed[0] || row.status, reason: '', invalidReason: '' })
   statusDialogVisible.value = true
 }
 
