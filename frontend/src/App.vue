@@ -126,24 +126,26 @@
                 <span>Call Center</span>
                 <h3>模拟外呼系统回调</h3>
               </div>
-              <el-tag type="info">{{ callCandidateLeads.length }} 条可回传</el-tag>
+              <el-tag type="info">{{ callCandidateLeads.length }} / {{ callbackLeads.length }} 条可回传</el-tag>
             </div>
-            <p class="callback-note">候选线索来自完整线索池，并按当前回传结果自动过滤，避免选择后状态机报错。</p>
+            <p class="callback-note">可搜索完整线索池；不符合当前外呼结果的线索会置灰，避免选择后状态机报错。</p>
             <el-form label-width="100px">
               <el-form-item label="线索">
                 <el-select v-model="callForm.leadId" filterable placeholder="搜索姓名、手机号、渠道" class="callback-select">
                   <el-option
-                    v-for="lead in callCandidateLeads"
+                    v-for="lead in callbackLeads"
                     :key="lead.id"
                     :label="callbackLeadLabel(lead)"
                     :value="lead.id"
+                    :disabled="!canCallbackLead(lead, callTargetStatus)"
                   >
                     <div class="callback-option">
                       <span>
                         <strong>{{ lead.customerName }}</strong>
                         <small>{{ lead.phone }} · {{ lead.source }} / {{ lead.channel }}</small>
                       </span>
-                      <el-tag size="small" :type="statusType(lead.status)">{{ lead.statusLabel }}</el-tag>
+                      <el-tag v-if="canCallbackLead(lead, callTargetStatus)" size="small" :type="statusType(lead.status)">{{ lead.statusLabel }}</el-tag>
+                      <el-tag v-else size="small" type="info">当前结果不可回传</el-tag>
                     </div>
                   </el-option>
                 </el-select>
@@ -170,24 +172,26 @@
                 <span>WeCom / SCRM</span>
                 <h3>模拟企微/SCRM 回调</h3>
               </div>
-              <el-tag type="info">{{ wechatCandidateLeads.length }} 条可回传</el-tag>
+              <el-tag type="info">{{ wechatCandidateLeads.length }} / {{ callbackLeads.length }} 条可回传</el-tag>
             </div>
-            <p class="callback-note">用于演示企微或 SCRM 把加微结果回写到线索系统，同时记录状态历史和审计日志。</p>
+            <p class="callback-note">可搜索完整线索池；不符合当前加微结果的线索会置灰，符合条件的回传会写入历史和审计日志。</p>
             <el-form label-width="100px">
               <el-form-item label="线索">
                 <el-select v-model="wechatForm.leadId" filterable placeholder="搜索姓名、手机号、渠道" class="callback-select">
                   <el-option
-                    v-for="lead in wechatCandidateLeads"
+                    v-for="lead in callbackLeads"
                     :key="lead.id"
                     :label="callbackLeadLabel(lead)"
                     :value="lead.id"
+                    :disabled="!canCallbackLead(lead, wechatTargetStatus)"
                   >
                     <div class="callback-option">
                       <span>
                         <strong>{{ lead.customerName }}</strong>
                         <small>{{ lead.phone }} · {{ lead.source }} / {{ lead.channel }}</small>
                       </span>
-                      <el-tag size="small" :type="statusType(lead.status)">{{ lead.statusLabel }}</el-tag>
+                      <el-tag v-if="canCallbackLead(lead, wechatTargetStatus)" size="small" :type="statusType(lead.status)">{{ lead.statusLabel }}</el-tag>
+                      <el-tag v-else size="small" type="info">当前结果不可回传</el-tag>
                     </div>
                   </el-option>
                 </el-select>
@@ -650,7 +654,11 @@ function statusType(status) {
 }
 
 function candidateLeadsFor(targetStatus) {
-  return callbackLeads.value.filter((lead) => transitionMap[lead.status]?.includes(targetStatus))
+  return callbackLeads.value.filter((lead) => canCallbackLead(lead, targetStatus))
+}
+
+function canCallbackLead(lead, targetStatus) {
+  return transitionMap[lead.status]?.includes(targetStatus)
 }
 
 function ensureCallbackSelections() {

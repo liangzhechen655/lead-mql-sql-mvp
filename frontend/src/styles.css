@@ -625,6 +625,10 @@ textarea {
   white-space: nowrap;
 }
 
+.callback-option .el-tag {
+  flex: 0 0 auto;
+}
+
 .detail-summary {
   display: flex;
   flex-wrap: wrap;
