@@ -1,24 +1,18 @@
 <template>
   <section class="dashboard-grid">
-    <div class="metric" v-loading="loading">
-      <span>总线索</span>
-      <strong>{{ funnel.total || 0 }}</strong>
-    </div>
-    <div class="metric">
-      <span>有效率</span>
-      <strong>{{ funnel.validRate || 0 }}%</strong>
-    </div>
-    <div class="metric">
-      <span>加微率</span>
-      <strong>{{ funnel.wechatRate || 0 }}%</strong>
-    </div>
-    <div class="metric">
-      <span>SQL 转化率</span>
-      <strong>{{ funnel.sqlRate || 0 }}%</strong>
+    <div v-for="item in metricCards" :key="item.label" class="metric" :class="item.tone" v-loading="item.loading">
+      <span>{{ item.label }}</span>
+      <strong>{{ item.value }}</strong>
+      <small>{{ item.caption }}</small>
     </div>
 
     <section class="panel wide">
-      <h3>状态漏斗</h3>
+      <div class="section-heading compact">
+        <div>
+          <span class="eyebrow">Lifecycle</span>
+          <h3>状态漏斗</h3>
+        </div>
+      </div>
       <div class="funnel">
         <div v-for="item in funnelItems" :key="item.key" class="funnel-row">
           <span>{{ item.label }}</span>
@@ -31,7 +25,12 @@
     </section>
 
     <section class="panel">
-      <h3>渠道 SQL 转化</h3>
+      <div class="section-heading compact">
+        <div>
+          <span class="eyebrow">Channel</span>
+          <h3>渠道 SQL 转化</h3>
+        </div>
+      </div>
       <el-table :data="funnel.channelConversions || []" height="300">
         <el-table-column prop="channel" label="渠道" />
         <el-table-column prop="total" label="总数" width="80" />
@@ -66,6 +65,13 @@ const statusOptions = [
   { label: 'MQL', value: 'MQL' },
   { label: 'SQL', value: 'SQL' }
 ]
+
+const metricCards = computed(() => [
+  { label: '总线索', value: props.funnel.total || 0, caption: '当前线索池', tone: 'tone-slate', loading: props.loading },
+  { label: '有效率', value: `${props.funnel.validRate || 0}%`, caption: '清洗后有效', tone: 'tone-emerald' },
+  { label: '加微率', value: `${props.funnel.wechatRate || 0}%`, caption: '私域承接', tone: 'tone-amber' },
+  { label: 'SQL 转化率', value: `${props.funnel.sqlRate || 0}%`, caption: '销售商机', tone: 'tone-cyan' }
+])
 
 const funnelItems = computed(() => {
   const counts = props.funnel.counts || {}

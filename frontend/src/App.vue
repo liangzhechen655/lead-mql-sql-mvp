@@ -33,11 +33,18 @@
             <el-option label="销售李四：仅看自己线索" value="SALES_LI" />
           </el-select>
         </section>
+
+        <section class="sidebar-insight">
+          <span>当前视角</span>
+          <strong>{{ currentUser?.name || '加载中' }}</strong>
+          <p>{{ roleMode === 'MANAGER' ? '主管全量漏斗' : '销售个人线索池' }}</p>
+        </section>
       </aside>
 
       <section class="workspace">
         <header class="topbar">
-          <div>
+          <div class="topbar-title">
+            <span>LeadOps Console</span>
             <h2>{{ currentTitle }}</h2>
             <p>{{ currentSubtitle }}</p>
           </div>
@@ -47,19 +54,30 @@
           </div>
         </header>
 
-        <section v-if="activeTab === 'leads'" class="panel">
+        <section class="topbar-stats">
+          <div v-for="item in quickStats" :key="item.label" class="stat-pill">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+          </div>
+        </section>
+
+        <section v-if="activeTab === 'leads'" class="panel lead-panel">
           <div class="toolbar">
-            <el-input v-model="filters.keyword" placeholder="搜索姓名、手机号、渠道" clearable :prefix-icon="Search" @keyup.enter="loadLeads" />
-            <el-select v-model="filters.status" placeholder="状态" clearable>
-              <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
-            <el-select v-model="filters.source" placeholder="来源" clearable>
-              <el-option v-for="item in sourceOptions" :key="item" :label="item" :value="item" />
-            </el-select>
-            <el-button :icon="Filter" @click="loadLeads">筛选</el-button>
-            <el-upload :show-file-list="false" accept=".csv" :before-upload="importCsv">
-              <el-button :icon="Upload">导入 CSV</el-button>
-            </el-upload>
+            <div class="toolbar-left">
+              <el-input v-model="filters.keyword" placeholder="搜索姓名、手机号、渠道" clearable :prefix-icon="Search" @keyup.enter="loadLeads" />
+              <el-select v-model="filters.status" placeholder="状态" clearable>
+                <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+              <el-select v-model="filters.source" placeholder="来源" clearable>
+                <el-option v-for="item in sourceOptions" :key="item" :label="item" :value="item" />
+              </el-select>
+            </div>
+            <div class="toolbar-right">
+              <el-button :icon="Filter" @click="loadLeads">筛选</el-button>
+              <el-upload :show-file-list="false" accept=".csv" :before-upload="importCsv">
+                <el-button :icon="Upload">导入 CSV</el-button>
+              </el-upload>
+            </div>
           </div>
 
           <el-table :data="leads" v-loading="loading.leads" height="560" @row-click="openDetail">
@@ -319,6 +337,12 @@ const currentSubtitle = computed(() => {
 })
 
 const sourceOptions = computed(() => [...new Set(leads.value.map((item) => item.source).filter(Boolean))])
+const quickStats = computed(() => [
+  { label: '总线索', value: funnel.value.total ?? leads.value.length },
+  { label: '有效率', value: `${funnel.value.validRate || 0}%` },
+  { label: 'SQL 转化', value: `${funnel.value.sqlRate || 0}%` },
+  { label: '异常线索', value: anomalies.value.length }
+])
 const activeSalesUser = computed(() => {
   if (roleMode.value === 'SALES_ZHANG') return salesUsers.value.find((u) => u.name === '张三')
   if (roleMode.value === 'SALES_LI') return salesUsers.value.find((u) => u.name === '李四')
