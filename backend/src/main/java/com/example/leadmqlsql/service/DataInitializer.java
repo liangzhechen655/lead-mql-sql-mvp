@@ -51,30 +51,30 @@ public class DataInitializer implements CommandLineRunner {
         ensureUser("王主管", "MANAGER", "增长运营部");
 
         List<SeedLead> seeds = List.of(
-                new SeedLead("陈先生", "13800000001", "百度投放", "百度-搜索", LeadStatus.NEW, null, LeadGrade.B, null),
-                new SeedLead("周女士", "13800000002", "抖音投放", "抖音-直播间", LeadStatus.VALID, zhang, LeadGrade.A, LocalDateTime.now().minusHours(60)),
-                new SeedLead("林同学", "13800000003", "官网表单", "官网", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(5)),
-                new SeedLead("赵经理", "13800000004", "微信社群", "社群", LeadStatus.MQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(3)),
-                new SeedLead("吴老师", "13800000005", "百度投放", "百度-信息流", LeadStatus.SQL, li, LeadGrade.A, LocalDateTime.now().minusHours(2)),
-                new SeedLead("无效样例", "13800000006", "抖音投放", "抖音-短视频", LeadStatus.INVALID, null, LeadGrade.C, null),
-                new SeedLead("何先生", "13800000007", "小红书投放", "小红书-搜索", LeadStatus.PENDING_CALL, null, LeadGrade.B, null),
-                new SeedLead("刘女士", "13800000008", "百度投放", "百度-搜索", LeadStatus.CALLED_CONNECTED, zhang, LeadGrade.B, LocalDateTime.now().minusHours(20)),
-                new SeedLead("孙总", "13800000009", "官网表单", "官网-预约咨询", LeadStatus.CALLED_NOT_CONNECTED, null, LeadGrade.C, null),
-                new SeedLead("马先生", "13800000010", "抖音投放", "抖音-表单", LeadStatus.PENDING_WECHAT, li, LeadGrade.A, LocalDateTime.now().minusHours(18)),
-                new SeedLead("高女士", "13800000011", "微信社群", "社群-直播课", LeadStatus.WECHAT_FAILED, zhang, LeadGrade.B, LocalDateTime.now().minusHours(30)),
-                new SeedLead("黄先生", "13800000012", "合作渠道", "代理商-A", LeadStatus.FOLLOWING, li, LeadGrade.A, LocalDateTime.now().minusHours(8)),
-                new SeedLead("宋女士", "13800000013", "百度投放", "百度-信息流", LeadStatus.SQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(4)),
-                new SeedLead("郑先生", "13800000014", "小红书投放", "小红书-笔记", LeadStatus.MQL, li, LeadGrade.B, LocalDateTime.now().minusHours(6)),
-                new SeedLead("唐女士", "13800000015", "官网表单", "官网-资料下载", LeadStatus.VALID, zhang, LeadGrade.B, LocalDateTime.now().minusHours(74)),
-                new SeedLead("许经理", "13800000016", "合作渠道", "代理商-B", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(54)),
-                new SeedLead("邓先生", "13800000017", "抖音投放", "抖音-直播间", LeadStatus.FOLLOWING, zhang, LeadGrade.A, LocalDateTime.now().minusHours(52)),
-                new SeedLead("曹女士", "13800000018", "微信社群", "社群-转介绍", LeadStatus.NEW, null, LeadGrade.C, null),
-                new SeedLead("彭先生", "13800000019", "百度投放", "百度-搜索", LeadStatus.PENDING_CALL, null, LeadGrade.B, null),
-                new SeedLead("梁女士", "13800000020", "小红书投放", "小红书-搜索", LeadStatus.VALID, li, LeadGrade.A, LocalDateTime.now().minusHours(12)),
-                new SeedLead("罗先生", "13800000021", "官网表单", "官网-在线客服", LeadStatus.SQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(1)),
-                new SeedLead("方女士", "13800000022", "合作渠道", "代理商-A", LeadStatus.INVALID, null, LeadGrade.C, null),
-                new SeedLead("程先生", "13800000023", "抖音投放", "抖音-短视频", LeadStatus.WECHAT_ADDED, zhang, LeadGrade.B, LocalDateTime.now().minusHours(9)),
-                new SeedLead("薛女士", "13800000024", "微信社群", "社群-公开课", LeadStatus.FOLLOWING, li, LeadGrade.A, LocalDateTime.now().minusHours(7))
+                new SeedLead("陈思远", "13800000001", "百度投放", "百度-搜索", LeadStatus.NEW, null, LeadGrade.B, null),
+                new SeedLead("周雨晴", "13800000002", "抖音投放", "抖音-直播间", LeadStatus.VALID, zhang, LeadGrade.A, LocalDateTime.now().minusHours(60)),
+                new SeedLead("林子墨", "13800000003", "官网表单", "官网", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(5)),
+                new SeedLead("赵明轩", "13800000004", "微信社群", "社群", LeadStatus.MQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(3)),
+                new SeedLead("吴佳宁", "13800000005", "百度投放", "百度-信息流", LeadStatus.SQL, li, LeadGrade.A, LocalDateTime.now().minusHours(2)),
+                new SeedLead("冯浩然", "13800000006", "抖音投放", "抖音-短视频", LeadStatus.INVALID, null, LeadGrade.C, null),
+                new SeedLead("何宇航", "13800000007", "小红书投放", "小红书-搜索", LeadStatus.PENDING_CALL, null, LeadGrade.B, null),
+                new SeedLead("刘若彤", "13800000008", "百度投放", "百度-搜索", LeadStatus.CALLED_CONNECTED, zhang, LeadGrade.B, LocalDateTime.now().minusHours(20)),
+                new SeedLead("孙嘉诚", "13800000009", "官网表单", "官网-预约咨询", LeadStatus.CALLED_NOT_CONNECTED, null, LeadGrade.C, null),
+                new SeedLead("马梓涵", "13800000010", "抖音投放", "抖音-表单", LeadStatus.PENDING_WECHAT, li, LeadGrade.A, LocalDateTime.now().minusHours(18)),
+                new SeedLead("高雅雯", "13800000011", "微信社群", "社群-直播课", LeadStatus.WECHAT_FAILED, zhang, LeadGrade.B, LocalDateTime.now().minusHours(30)),
+                new SeedLead("黄俊杰", "13800000012", "合作渠道", "代理商-A", LeadStatus.FOLLOWING, li, LeadGrade.A, LocalDateTime.now().minusHours(8)),
+                new SeedLead("宋芷涵", "13800000013", "百度投放", "百度-信息流", LeadStatus.SQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(4)),
+                new SeedLead("郑凯文", "13800000014", "小红书投放", "小红书-笔记", LeadStatus.MQL, li, LeadGrade.B, LocalDateTime.now().minusHours(6)),
+                new SeedLead("唐诗涵", "13800000015", "官网表单", "官网-资料下载", LeadStatus.VALID, zhang, LeadGrade.B, LocalDateTime.now().minusHours(74)),
+                new SeedLead("许博文", "13800000016", "合作渠道", "代理商-B", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(54)),
+                new SeedLead("邓一鸣", "13800000017", "抖音投放", "抖音-直播间", LeadStatus.FOLLOWING, zhang, LeadGrade.A, LocalDateTime.now().minusHours(52)),
+                new SeedLead("曹悦然", "13800000018", "微信社群", "社群-转介绍", LeadStatus.NEW, null, LeadGrade.C, null),
+                new SeedLead("彭子昂", "13800000019", "百度投放", "百度-搜索", LeadStatus.PENDING_CALL, null, LeadGrade.B, null),
+                new SeedLead("梁沐晴", "13800000020", "小红书投放", "小红书-搜索", LeadStatus.VALID, li, LeadGrade.A, LocalDateTime.now().minusHours(12)),
+                new SeedLead("罗子睿", "13800000021", "官网表单", "官网-在线客服", LeadStatus.SQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(1)),
+                new SeedLead("方梓萱", "13800000022", "合作渠道", "代理商-A", LeadStatus.INVALID, null, LeadGrade.C, null),
+                new SeedLead("程浩宇", "13800000023", "抖音投放", "抖音-短视频", LeadStatus.WECHAT_ADDED, zhang, LeadGrade.B, LocalDateTime.now().minusHours(9)),
+                new SeedLead("薛雅琪", "13800000024", "微信社群", "社群-公开课", LeadStatus.FOLLOWING, li, LeadGrade.A, LocalDateTime.now().minusHours(7))
         );
 
         seeds.forEach(this::createLeadIfMissing);
@@ -98,7 +98,9 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createLeadIfMissing(SeedLead seed) {
-        if (leadRepository.existsByPhone(seed.phone())) {
+        var existing = leadRepository.findByPhone(seed.phone());
+        if (existing.isPresent()) {
+            refreshPlaceholderName(existing.get(), seed.name());
             return;
         }
 
@@ -119,6 +121,23 @@ public class DataInitializer implements CommandLineRunner {
         if (seed.lastFollowUpAt() != null) {
             createFollowUp(saved, seed.owner());
         }
+    }
+
+    private void refreshPlaceholderName(SalesLead lead, String seedName) {
+        if (isPlaceholderName(lead.getCustomerName())) {
+            lead.setCustomerName(seedName);
+            leadRepository.save(lead);
+        }
+    }
+
+    private boolean isPlaceholderName(String name) {
+        return name != null && (name.endsWith("先生")
+                || name.endsWith("女士")
+                || name.endsWith("经理")
+                || name.endsWith("老师")
+                || name.endsWith("同学")
+                || name.endsWith("总")
+                || name.contains("样例"));
     }
 
     private void applyDerivedFields(SalesLead lead, LeadStatus status) {
