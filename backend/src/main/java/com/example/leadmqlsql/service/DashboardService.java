@@ -34,8 +34,8 @@ public class DashboardService {
         for (LeadStatus status : LeadStatus.values()) {
             counts.put(status.name(), leads.stream().filter(l -> l.getStatus() == status).count());
         }
-        long valid = countIn(leads, LeadStatus.VALID, LeadStatus.PENDING_WECHAT, LeadStatus.WECHAT_ADDED, LeadStatus.WECHAT_FAILED, LeadStatus.FOLLOWING, LeadStatus.MQL, LeadStatus.SQL);
-        long wechatAdded = countIn(leads, LeadStatus.WECHAT_ADDED, LeadStatus.FOLLOWING, LeadStatus.MQL, LeadStatus.SQL);
+        long valid = countIn(leads, LeadStatus.VALID, LeadStatus.PENDING_WECHAT, LeadStatus.WECHAT_ADDED, LeadStatus.WECHAT_FAILED, LeadStatus.MQL, LeadStatus.SQL);
+        long wechatAdded = countIn(leads, LeadStatus.WECHAT_ADDED, LeadStatus.MQL, LeadStatus.SQL);
         long mql = countIn(leads, LeadStatus.MQL, LeadStatus.SQL);
         long sql = countIn(leads, LeadStatus.SQL);
         List<ChannelConversion> channelConversions = leads.stream()
@@ -55,7 +55,7 @@ public class DashboardService {
     @Transactional(readOnly = true)
     public List<LeadResponse> anomalies() {
         LocalDateTime threshold = LocalDateTime.now().minusHours(48);
-        List<LeadStatus> activeStatuses = List.of(LeadStatus.VALID, LeadStatus.PENDING_WECHAT, LeadStatus.WECHAT_ADDED, LeadStatus.FOLLOWING, LeadStatus.MQL);
+        List<LeadStatus> activeStatuses = List.of(LeadStatus.VALID, LeadStatus.PENDING_WECHAT, LeadStatus.WECHAT_ADDED, LeadStatus.MQL);
         Map<Long, SalesLead> result = new LinkedHashMap<>();
         leadRepository.findByStatusInAndLastFollowUpAtBefore(activeStatuses, threshold)
                 .forEach(lead -> result.put(lead.getId(), lead));

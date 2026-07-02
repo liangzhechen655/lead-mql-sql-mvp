@@ -45,6 +45,7 @@ public class DataInitializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         backfillVersionForExistingLeads();
+        backfillFollowingStatusForExistingLeads();
 
         SalesUser zhang = ensureUser("张三", "SALES", "华东销售组");
         SalesUser li = ensureUser("李四", "SALES", "华南销售组");
@@ -62,19 +63,19 @@ public class DataInitializer implements CommandLineRunner {
                 new SeedLead("孙嘉诚", "13800000009", "官网表单", "官网-预约咨询", LeadStatus.CALLED_NOT_CONNECTED, null, LeadGrade.C, null),
                 new SeedLead("马梓涵", "13800000010", "抖音投放", "抖音-表单", LeadStatus.PENDING_WECHAT, li, LeadGrade.A, LocalDateTime.now().minusHours(18)),
                 new SeedLead("高雅雯", "13800000011", "微信社群", "社群-直播课", LeadStatus.WECHAT_FAILED, zhang, LeadGrade.B, LocalDateTime.now().minusHours(30)),
-                new SeedLead("黄俊杰", "13800000012", "合作渠道", "代理商-A", LeadStatus.FOLLOWING, li, LeadGrade.A, LocalDateTime.now().minusHours(8)),
+                new SeedLead("黄俊杰", "13800000012", "合作渠道", "代理商-A", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(8)),
                 new SeedLead("宋芷涵", "13800000013", "百度投放", "百度-信息流", LeadStatus.SQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(4)),
                 new SeedLead("郑凯文", "13800000014", "小红书投放", "小红书-笔记", LeadStatus.MQL, li, LeadGrade.B, LocalDateTime.now().minusHours(6)),
                 new SeedLead("唐诗涵", "13800000015", "官网表单", "官网-资料下载", LeadStatus.VALID, zhang, LeadGrade.B, LocalDateTime.now().minusHours(74)),
                 new SeedLead("许博文", "13800000016", "合作渠道", "代理商-B", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(54)),
-                new SeedLead("邓一鸣", "13800000017", "抖音投放", "抖音-直播间", LeadStatus.FOLLOWING, zhang, LeadGrade.A, LocalDateTime.now().minusHours(52)),
+                new SeedLead("邓一鸣", "13800000017", "抖音投放", "抖音-直播间", LeadStatus.WECHAT_ADDED, zhang, LeadGrade.A, LocalDateTime.now().minusHours(52)),
                 new SeedLead("曹悦然", "13800000018", "微信社群", "社群-转介绍", LeadStatus.NEW, null, LeadGrade.C, null),
                 new SeedLead("彭子昂", "13800000019", "百度投放", "百度-搜索", LeadStatus.PENDING_CALL, null, LeadGrade.B, null),
                 new SeedLead("梁沐晴", "13800000020", "小红书投放", "小红书-搜索", LeadStatus.VALID, li, LeadGrade.A, LocalDateTime.now().minusHours(12)),
                 new SeedLead("罗子睿", "13800000021", "官网表单", "官网-在线客服", LeadStatus.SQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(1)),
                 new SeedLead("方梓萱", "13800000022", "合作渠道", "代理商-A", LeadStatus.INVALID, null, LeadGrade.C, null),
                 new SeedLead("程浩宇", "13800000023", "抖音投放", "抖音-短视频", LeadStatus.WECHAT_ADDED, zhang, LeadGrade.B, LocalDateTime.now().minusHours(9)),
-                new SeedLead("薛雅琪", "13800000024", "微信社群", "社群-公开课", LeadStatus.FOLLOWING, li, LeadGrade.A, LocalDateTime.now().minusHours(7)),
+                new SeedLead("薛雅琪", "13800000024", "微信社群", "社群-公开课", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(7)),
                 new SeedLead("沈嘉禾", "13800000025", "百度投放", "百度-搜索", LeadStatus.NEW, null, LeadGrade.B, null),
                 new SeedLead("袁若溪", "13800000026", "抖音投放", "抖音-直播间", LeadStatus.PENDING_CALL, null, LeadGrade.B, null),
                 new SeedLead("陆景行", "13800000027", "官网表单", "官网-预约咨询", LeadStatus.CALLED_CONNECTED, zhang, LeadGrade.A, LocalDateTime.now().minusHours(16)),
@@ -83,13 +84,13 @@ public class DataInitializer implements CommandLineRunner {
                 new SeedLead("白予安", "13800000030", "合作渠道", "代理商-B", LeadStatus.PENDING_WECHAT, zhang, LeadGrade.B, LocalDateTime.now().minusHours(21)),
                 new SeedLead("邱雨薇", "13800000031", "百度投放", "百度-信息流", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(11)),
                 new SeedLead("贺云舟", "13800000032", "抖音投放", "抖音-表单", LeadStatus.WECHAT_FAILED, zhang, LeadGrade.C, LocalDateTime.now().minusHours(38)),
-                new SeedLead("孟知夏", "13800000033", "官网表单", "官网-资料下载", LeadStatus.FOLLOWING, li, LeadGrade.B, LocalDateTime.now().minusHours(10)),
+                new SeedLead("孟知夏", "13800000033", "官网表单", "官网-资料下载", LeadStatus.WECHAT_ADDED, li, LeadGrade.B, LocalDateTime.now().minusHours(10)),
                 new SeedLead("尹浩轩", "13800000034", "小红书投放", "小红书-搜索", LeadStatus.MQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(5)),
                 new SeedLead("顾清妍", "13800000035", "微信社群", "社群-转介绍", LeadStatus.SQL, li, LeadGrade.A, LocalDateTime.now().minusHours(2)),
                 new SeedLead("叶承泽", "13800000036", "合作渠道", "代理商-A", LeadStatus.INVALID, null, LeadGrade.C, null),
                 new SeedLead("许念初", "13800000037", "百度投放", "百度-搜索", LeadStatus.VALID, zhang, LeadGrade.B, LocalDateTime.now().minusHours(80)),
                 new SeedLead("钟奕辰", "13800000038", "抖音投放", "抖音-短视频", LeadStatus.WECHAT_ADDED, li, LeadGrade.B, LocalDateTime.now().minusHours(49)),
-                new SeedLead("任书瑶", "13800000039", "官网表单", "官网-在线客服", LeadStatus.FOLLOWING, zhang, LeadGrade.A, LocalDateTime.now().minusHours(4)),
+                new SeedLead("任书瑶", "13800000039", "官网表单", "官网-在线客服", LeadStatus.WECHAT_ADDED, zhang, LeadGrade.A, LocalDateTime.now().minusHours(4)),
                 new SeedLead("夏明远", "13800000040", "小红书投放", "小红书-搜索", LeadStatus.NEW, null, LeadGrade.C, null),
                 new SeedLead("江语晨", "13800000041", "微信社群", "社群-公开课", LeadStatus.PENDING_CALL, null, LeadGrade.B, null),
                 new SeedLead("龙梓豪", "13800000042", "合作渠道", "代理商-C", LeadStatus.VALID, li, LeadGrade.A, LocalDateTime.now().minusHours(14)),
@@ -100,13 +101,13 @@ public class DataInitializer implements CommandLineRunner {
                 new SeedLead("石安琪", "13800000047", "微信社群", "社群-直播课", LeadStatus.INVALID, null, LeadGrade.C, null),
                 new SeedLead("苏景然", "13800000048", "合作渠道", "代理商-A", LeadStatus.CALLED_CONNECTED, zhang, LeadGrade.B, LocalDateTime.now().minusHours(25)),
                 new SeedLead("段嘉言", "13800000049", "百度投放", "百度-搜索", LeadStatus.CALLED_NOT_CONNECTED, null, LeadGrade.C, null),
-                new SeedLead("姜晚晴", "13800000050", "抖音投放", "抖音-表单", LeadStatus.FOLLOWING, li, LeadGrade.A, LocalDateTime.now().minusHours(58)),
+                new SeedLead("姜晚晴", "13800000050", "抖音投放", "抖音-表单", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(58)),
                 new SeedLead("谢知远", "13800000051", "官网表单", "官网-资料下载", LeadStatus.NEW, null, LeadGrade.B, null),
                 new SeedLead("林清越", "13800000052", "小红书投放", "小红书-搜索", LeadStatus.PENDING_CALL, null, LeadGrade.B, null),
                 new SeedLead("邵一诺", "13800000053", "微信社群", "社群-转介绍", LeadStatus.VALID, zhang, LeadGrade.A, LocalDateTime.now().minusHours(9)),
                 new SeedLead("余沐阳", "13800000054", "合作渠道", "代理商-B", LeadStatus.WECHAT_ADDED, li, LeadGrade.B, LocalDateTime.now().minusHours(34)),
                 new SeedLead("傅锦程", "13800000055", "百度投放", "百度-信息流", LeadStatus.WECHAT_FAILED, zhang, LeadGrade.C, LocalDateTime.now().minusHours(43)),
-                new SeedLead("罗依然", "13800000056", "抖音投放", "抖音-短视频", LeadStatus.FOLLOWING, li, LeadGrade.A, LocalDateTime.now().minusHours(12)),
+                new SeedLead("罗依然", "13800000056", "抖音投放", "抖音-短视频", LeadStatus.WECHAT_ADDED, li, LeadGrade.A, LocalDateTime.now().minusHours(12)),
                 new SeedLead("程予希", "13800000057", "官网表单", "官网-在线客服", LeadStatus.MQL, zhang, LeadGrade.A, LocalDateTime.now().minusHours(8)),
                 new SeedLead("岳景澄", "13800000058", "小红书投放", "小红书-笔记", LeadStatus.SQL, li, LeadGrade.A, LocalDateTime.now().minusHours(2)),
                 new SeedLead("秦慕白", "13800000059", "微信社群", "社群-公开课", LeadStatus.INVALID, null, LeadGrade.C, null),
@@ -118,6 +119,10 @@ public class DataInitializer implements CommandLineRunner {
 
     private void backfillVersionForExistingLeads() {
         jdbcTemplate.update("update lead_record set version = 0 where version is null");
+    }
+
+    private void backfillFollowingStatusForExistingLeads() {
+        jdbcTemplate.update("update lead_record set status = 'WECHAT_ADDED' where status = 'FOLLOWING'");
     }
 
     private SalesUser ensureUser(String name, String role, String team) {

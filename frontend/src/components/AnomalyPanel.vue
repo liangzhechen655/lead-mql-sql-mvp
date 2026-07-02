@@ -4,7 +4,7 @@
       <div>
         <span class="eyebrow">Risk Queue</span>
         <h3>异常线索提醒</h3>
-        <p>有效线索、加微后线索、跟进中线索超过 48 小时未跟进会进入此列表。</p>
+        <p>有效线索、待加微线索、已加微线索和 MQL 线索超过 48 小时未跟进会进入此列表。</p>
       </div>
       <el-button :icon="Refresh" @click="$emit('refresh')">刷新异常</el-button>
     </div>

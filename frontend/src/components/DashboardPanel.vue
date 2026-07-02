@@ -61,7 +61,6 @@ const statusOptions = [
   { label: '待加微', value: 'PENDING_WECHAT' },
   { label: '已加微', value: 'WECHAT_ADDED' },
   { label: '加微失败', value: 'WECHAT_FAILED' },
-  { label: '跟进中', value: 'FOLLOWING' },
   { label: 'MQL', value: 'MQL' },
   { label: 'SQL', value: 'SQL' }
 ]

@@ -68,6 +68,8 @@ class LeadServiceTests {
         leadService.updateStatus(lead.id(), new StatusUpdateRequest(LeadStatus.VALID, "call valid", "call-center", null));
         leadService.updateStatus(lead.id(), new StatusUpdateRequest(LeadStatus.WECHAT_ADDED, "wechat added", "wechat", null));
         leadService.addFollowUp(lead.id(), new FollowUpRequest(sales.getId(), "Phone", "Customer has clear interest", null));
+        LeadResponse afterFollowUp = leadService.detail(lead.id(), sales.getId()).lead();
+        assertThat(afterFollowUp.status()).isEqualTo(LeadStatus.WECHAT_ADDED);
         LeadResponse mql = leadService.updateStatus(lead.id(), new StatusUpdateRequest(LeadStatus.MQL, "qualified", sales.getName(), null));
         LeadResponse sql = leadService.updateStatus(lead.id(), new StatusUpdateRequest(LeadStatus.SQL, "sales opportunity", sales.getName(), null));
 

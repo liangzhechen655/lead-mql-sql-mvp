@@ -57,13 +57,13 @@ public class LeadService {
         ALLOWED_TRANSITIONS.put(LeadStatus.PENDING_CALL, EnumSet.of(LeadStatus.CALLED_CONNECTED, LeadStatus.CALLED_NOT_CONNECTED, LeadStatus.VALID, LeadStatus.INVALID));
         ALLOWED_TRANSITIONS.put(LeadStatus.CALLED_CONNECTED, EnumSet.of(LeadStatus.VALID, LeadStatus.INVALID));
         ALLOWED_TRANSITIONS.put(LeadStatus.CALLED_NOT_CONNECTED, EnumSet.of(LeadStatus.PENDING_CALL, LeadStatus.INVALID));
-        ALLOWED_TRANSITIONS.put(LeadStatus.VALID, EnumSet.of(LeadStatus.PENDING_WECHAT, LeadStatus.WECHAT_ADDED, LeadStatus.WECHAT_FAILED, LeadStatus.FOLLOWING, LeadStatus.INVALID));
+        ALLOWED_TRANSITIONS.put(LeadStatus.VALID, EnumSet.of(LeadStatus.PENDING_WECHAT, LeadStatus.WECHAT_ADDED, LeadStatus.WECHAT_FAILED, LeadStatus.INVALID));
         ALLOWED_TRANSITIONS.put(LeadStatus.INVALID, EnumSet.noneOf(LeadStatus.class));
         ALLOWED_TRANSITIONS.put(LeadStatus.PENDING_WECHAT, EnumSet.of(LeadStatus.WECHAT_ADDED, LeadStatus.WECHAT_FAILED));
-        ALLOWED_TRANSITIONS.put(LeadStatus.WECHAT_ADDED, EnumSet.of(LeadStatus.FOLLOWING));
+        ALLOWED_TRANSITIONS.put(LeadStatus.WECHAT_ADDED, EnumSet.of(LeadStatus.MQL, LeadStatus.INVALID));
         ALLOWED_TRANSITIONS.put(LeadStatus.WECHAT_FAILED, EnumSet.of(LeadStatus.PENDING_WECHAT, LeadStatus.INVALID));
         ALLOWED_TRANSITIONS.put(LeadStatus.FOLLOWING, EnumSet.of(LeadStatus.MQL, LeadStatus.INVALID));
-        ALLOWED_TRANSITIONS.put(LeadStatus.MQL, EnumSet.of(LeadStatus.SQL, LeadStatus.FOLLOWING));
+        ALLOWED_TRANSITIONS.put(LeadStatus.MQL, EnumSet.of(LeadStatus.SQL));
         ALLOWED_TRANSITIONS.put(LeadStatus.SQL, EnumSet.noneOf(LeadStatus.class));
     }
 
@@ -201,11 +201,6 @@ public class LeadService {
         record.setNextFollowUpAt(request.nextFollowUpAt());
         FollowUpRecord saved = followUpRepository.save(record);
         lead.setLastFollowUpAt(LocalDateTime.now());
-        if (lead.getStatus() == LeadStatus.WECHAT_ADDED || lead.getStatus() == LeadStatus.VALID) {
-            LeadStatus from = lead.getStatus();
-            lead.setStatus(LeadStatus.FOLLOWING);
-            saveHistory(lead, from, LeadStatus.FOLLOWING, operatorName(operator), "Follow-up added");
-        }
         leadRepository.save(lead);
         log(lead, "ADD_FOLLOW_UP", operatorName(operator), request.method() + ": " + request.content());
         return toFollowUpResponse(saved);
